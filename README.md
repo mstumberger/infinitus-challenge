@@ -1,6 +1,6 @@
 [![Python 3.7.2](https://img.shields.io/badge/python-3.7.2-blue.svg)](https://www.python.org/downloads/release/python-372/) [![Twisted](https://img.shields.io/badge/twisted-18.9.0-blue.svg)]() [![MS](https://img.shields.io/badge/Marko-%C5%A0tumberger-green.svg)](https://github.com/mstumberger)
 
-#Instructions
+# Instructions #
 The main purpose of the application is to offer contacts autocompletion, as available e.g. in a phone.
 The application does not need to persist the contacts, its main purpose is to serve as an in-memory cache
 for its clients. You can assume that a separate application will fill "Pozabljivi imenik"’s cache soon 
