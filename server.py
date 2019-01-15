@@ -61,7 +61,7 @@ class PozabljivImenik(Protocol):
     def response(self, success, result):
         encoded_string = cP.encode({ 'success': success, 'result': result })
         print(encoded_string)
-        self.transport.write(encoded_string)
+        self.transport.write(encoded_string.encode('utf-8'))
 
 
 class PozabljivImenikFactory(Factory):

@@ -1,7 +1,7 @@
 import json
 
 def encode(message: dict):
-    parsed_message = json.dumps(message).encode('utf8')
+    parsed_message = json.dumps(message, ensure_ascii=True)
     length = len(parsed_message)
     return padhexa(length)+parsed_message
 
@@ -9,7 +9,7 @@ def decode(message: str):
     return message[:4], message[4:]
 
 def padhexa(length: int):
-    return str(hex(length)[2:].zfill(4)).encode('utf-8')
+    return str(hex(length)[2:].zfill(4))
 
 if __name__ == "__main__":
     var = """
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         whose value specifies which command “Pozabljivi imenik” should perform,
         as well as all parameters required by that specific command.
     """
-    payload_1 = len(json.dumps({"foo": "bar", "bar": "baz", "baz": 12345}).encode('utf8'))
+    payload_1 = len(json.dumps({"foo": "bar", "bar": "baz", "baz": 12345}, ensure_ascii=True))
     print(payload_1, padhexa(payload_1))
     payload_1 = len(json.dumps({"command": "MAKE", "instructions": var}))
     print(payload_1, str(padhexa(payload_1)).lower())
@@ -39,5 +39,8 @@ if __name__ == "__main__":
         42 002a
         1045 0415
         ('0415', 'marko')
+42 b'002a'
+1045 b'0415'
+(b'002a', b'{"foo": "bar", "bar": "baz", "baz": 12345}')
     """
 
