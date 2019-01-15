@@ -156,3 +156,17 @@ after startup of "Pozabljivi imenik" (using the "PUT" command, as described belo
     4. Run server:
     
         ``` python3 server.py ```
+    
+    5. Run commands:
+    
+        ```bash
+        
+        curl -X PUT http://localhost:4242/ -H 'content-type: application/json' -d '{"command": "PUT", "phone": "112", "name": "klic", "surname": "v sili"}'
+        
+        curl -X PUT http://localhost:4242/ -H 'content-type: application/json' -d '{"command": "GET", "phone": "112"}'
+                
+        curl -X PUT http://localhost:4242/ -H 'content-type: application/json' -d '{"command": "DELETE", "phone": "112"}'
+                
+        curl -X PUT http://localhost:4242/ -H 'content-type: application/json' -d '{"command": "FIND", "prefix": "kl"}'
+        
+        ```

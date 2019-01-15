@@ -33,7 +33,6 @@ class PozabljivImenik(Protocol):
 
         try:
             data = json.loads(data)
-            print(type(data))
             self.action(data)
         except json.decoder.JSONDecodeError as e:
             print('JSONDecodeError: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
@@ -44,7 +43,7 @@ class PozabljivImenik(Protocol):
         result = None
 
         if 'command' in data:
-            command = data['command']
+            command = data['command'].upper()
 
             if command == ACTION.PUT:
                     exists = False
@@ -73,7 +72,7 @@ class PozabljivImenik(Protocol):
 
             elif command == ACTION.FIND:
                 if 'prefix' in data:
-                    result = json.dumps([contact.__dict__ for contact in filter_by_prefix(data['prefix'], self.CONTACTS)])
+                    result = [contact.__dict__ for contact in filter_by_prefix(data['prefix'], self.CONTACTS)]
                     success = True
                 else:
                     self.response(success, result, 'Prefix is missing!')
