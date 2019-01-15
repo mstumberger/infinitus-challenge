@@ -2,17 +2,13 @@ from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 from helpers.Enum import ACTION
-from helpers.Contact import Contact
-from helpers.Filter import filter_by_prefix
+from helpers.Contacts import Contacts
 import helpers.CustomProtocol as cP
 import json
 import sys
 
 class PozabljivImenik(Protocol):
-    CONTACTS = [
-        Contact("klic", "v sili", "112"),
-        Contact("Klemen", "Klemen", "424242")
-    ]
+    CONTACTS = Contacts()
 
     def __init__(self, factory):
         self.factory = factory
@@ -21,7 +17,7 @@ class PozabljivImenik(Protocol):
         print("Connection made")
 
     def connectionLost(self, reason):
-        print("Connection lost")
+        print("Connection lost", reason)
 
     def dataReceived(self, data):
         data = data.decode('utf-8')
@@ -36,69 +32,36 @@ class PozabljivImenik(Protocol):
             self.action(data)
         except json.decoder.JSONDecodeError as e:
             print('JSONDecodeError: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
-            self.response(False, None, 'JSONDecodeError: {}'.format(e))
+            self.response(False, 'JSONDecodeError: {}'.format(e))
 
     def action(self, data):
-        success = False
-        result = None
-
         if 'command' in data:
             command = data['command'].upper()
-
             if command == ACTION.PUT:
-                    exists = False
-                    for contact in self.CONTACTS:
-                        if contact.phone == data['phone']:
-                            exists = True
-                            break
-                    if not exists:
-                        self.CONTACTS.append(Contact(data['name'], data['surname'], data['phone']))
-                        success = True
-                    else:
-                        self.response(success, result, 'Number exists')
-                        return
+                success, result = self.CONTACTS.action_PUT(data)
 
             elif command == ACTION.GET:
-                for contact in self.CONTACTS:
-                    if contact.phone == data['phone']:
-                        result=contact.__dict__
-                        success = True
+                success, result = self.CONTACTS.action_GET(data)
 
             elif command == ACTION.DELETE:
-                for contact in self.CONTACTS[:]:
-                    if contact.phone == data['phone']:
-                        self.CONTACTS.remove(contact)
-                        success = True
+                success, result = self.CONTACTS.action_DELETE(data)
 
             elif command == ACTION.FIND:
-                if 'prefix' in data:
-                    result = [contact.__dict__ for contact in filter_by_prefix(data['prefix'], self.CONTACTS)]
-                    success = True
-                else:
-                    self.response(success, result, 'Prefix is missing!')
-                    return
+                success, result = self.CONTACTS.action_FIND(data)
 
             else:
-                self.response(success, result, 'Command not found.')
-                return
-
-            self.response(success, result)
-            return
+                result = 'Command not found or missing a value'
+                success = False
         else:
-            self.response(success, result, 'Command is missing!')
-            return
+            result = 'Command is missing!'
+            success = False
 
-    def response(self, success, result, reason=None):
-        data = dict()
-        data['success'] = success
-        data['result'] = result
-        if reason is not None:
-            data[reason] = reason
+        self.response(success, result)
 
-        encoded_string = cP.encode(data)
+    def response(self, success, result):
+        encoded_string = cP.encode({ 'success': success, 'result': result })
         print(encoded_string)
         self.transport.write(encoded_string)
-
 
 
 class PozabljivImenikFactory(Factory):
