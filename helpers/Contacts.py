@@ -9,14 +9,14 @@ class Contacts:
         ]
 
     def action_PUT(self, data: dict):
-        result, success, exists = None, False, False
+        result, success = None, False
         if 'name' in data.keys() and 'surname' in data.keys() and 'phone' in data.keys():
             for contact in self.CONTACTS:
                 if contact.phone == data['phone']:
                     contact.name = data['name']
                     contact.surname = data['surname']
                     success = True
-            if not exists:
+            if not success:
                 self.CONTACTS.append(Contact(data['name'], data['surname'], data['phone']))
                 success = True
         else:
