@@ -6,6 +6,7 @@ from helpers.Contact import Contact
 from helpers.Filter import filter_by_prefix
 import helpers.CustomProtocol as cP
 import json
+import sys
 
 class PozabljivImenik(Protocol):
     CONTACTS = [
@@ -29,11 +30,14 @@ class PozabljivImenik(Protocol):
             return
         if '\r\n\r\n' in data:
             data = data.split('\r\n\r\n')[1]
-            print(data)
-            print(type(data))
+
+        try:
             data = json.loads(data)
             print(type(data))
             self.action(data)
+        except json.decoder.JSONDecodeError as e:
+            print('JSONDecodeError: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
+            self.response(False, None, 'JSONDecodeError: {}'.format(e))
 
     def action(self, data):
         success = False
@@ -43,10 +47,17 @@ class PozabljivImenik(Protocol):
             command = data['command']
 
             if command == ACTION.PUT:
-                # for contact in self.CONTACTS:
-                #     if contact.phone != data['phone']:
+                    exists = False
+                    for contact in self.CONTACTS:
+                        if contact.phone == data['phone']:
+                            exists = True
+                            break
+                    if not exists:
                         self.CONTACTS.append(Contact(data['name'], data['surname'], data['phone']))
                         success = True
+                    else:
+                        self.response(success, result, 'Number exists')
+                        return
 
             elif command == ACTION.GET:
                 for contact in self.CONTACTS:
@@ -65,16 +76,26 @@ class PozabljivImenik(Protocol):
                     result = json.dumps([contact.__dict__ for contact in filter_by_prefix(data['prefix'], self.CONTACTS)])
                     success = True
                 else:
-                    self.response({"success": success, 'result': result, 'reason': 'Prefix is missing!'})
+                    self.response(success, result, 'Prefix is missing!')
+                    return
 
             else:
-                self.response({"success": success, 'result': result, 'reason': 'Command not found.'})
+                self.response(success, result, 'Command not found.')
+                return
 
-            self.response({ "success": success, 'result': result })
+            self.response(success, result)
+            return
         else:
-            self.response({"success": success, 'result': result, 'reason': 'Command is missing!'})
+            self.response(success, result, 'Command is missing!')
+            return
 
-    def response(self, data):
+    def response(self, success, result, reason=None):
+        data = dict()
+        data['success'] = success
+        data['result'] = result
+        if reason is not None:
+            data[reason] = reason
+
         encoded_string = cP.encode(data)
         print(encoded_string)
         self.transport.write(encoded_string)
@@ -87,9 +108,6 @@ class PozabljivImenikFactory(Factory):
 
 
 def main():
-    # endpoint = TCP4ServerEndpoint(reactor, 4242)
-    # endpoint.listen(PozabljivImenikFactory())
-    # reactor.run()
     reactor.listenTCP(4242, PozabljivImenikFactory())
     reactor.run()
 

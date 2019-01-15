@@ -152,3 +152,7 @@ after startup of "Pozabljivi imenik" (using the "PUT" command, as described belo
         or
         
         ``` PS  \venv\Scripts\activate ```
+    
+    4. Run server:
+    
+        ``` python3 server.py ```
