@@ -31,37 +31,41 @@ class PozabljivImenik(Protocol):
         try:
             array_of_commands = cP.decode(data)
             for command in array_of_commands:
-                self.action(json.loads(command))
+                self.action(json.loads(command[1]))
         except json.decoder.JSONDecodeError as e:
             print('JSONDecodeError: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
             self.response(False, 'JSONDecodeError: {}'.format(e))
 
     def action(self, data):
-        if 'command' in data:
-            command = data['command'].upper()
-            if command == ACTION.PUT:
-                success, result = self.CONTACTS.action_PUT(data)
+        try:
+            if 'command' in data:
+                command = data['command'].upper()
+                if command == ACTION.PUT:
+                    success, result = self.CONTACTS.action_PUT(data)
 
-            elif command == ACTION.GET:
-                success, result = self.CONTACTS.action_GET(data)
+                elif command == ACTION.GET:
+                    success, result = self.CONTACTS.action_GET(data)
 
-            elif command == ACTION.DELETE:
-                success, result = self.CONTACTS.action_DELETE(data)
+                elif command == ACTION.DELETE:
+                    success, result = self.CONTACTS.action_DELETE(data)
 
-            elif command == ACTION.FIND:
-                success, result = self.CONTACTS.action_FIND(data)
+                elif command == ACTION.FIND:
+                    success, result = self.CONTACTS.action_FIND(data)
 
+                else:
+                    result = 'Command not found or missing a value'
+                    success = False
             else:
-                result = 'Command not found or missing a value'
+                result = 'Command is missing!'
                 success = False
-        else:
-            result = 'Command is missing!'
-            success = False
 
-        self.response(success, result)
+            self.response(success, result)
+        except Exception as e:
+            print('Error: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
+            self.response(False, 'ActionError: {}'.format(e))
 
     def response(self, success, result):
-        encoded_string = cP.encode({ 'success': success, 'result': result })
+        encoded_string = cP.encode({'success': success, 'result': result})
         print(encoded_string)
         self.transport.write(encoded_string.encode('utf-8'))
 

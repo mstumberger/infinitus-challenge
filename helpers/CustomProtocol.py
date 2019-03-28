@@ -9,7 +9,7 @@ def encode(message: dict):
 
 
 def decode(message: str):
-    array = re.findall(r"({[^}]+})", message)
+    array = re.findall(r'([a-f0-9]{4})({[^}]+})', message)
     return array
 
 
@@ -40,9 +40,10 @@ if __name__ == "__main__":
     # print(payload_1, str(padhexa(payload_1)).lower())
     # print(decode(encode({"foo": "bar", "bar": "baz", "baz": 12345})))
     string = '005c{"command": "PUT", "name": "Ruthe", "surname": "Van der Beken", "phone": "+60-293-920-4517"}0055{"command": "PUT", "name": "Lynn", "surname": "Blacket", "phone": "+62-746-315-8965"}0052{"command": "PUT", "name": "Duky", "surname": "Batch", "phone": "+7-812-344-9366"}0056{"command": "PUT", "name": "Linet", "surname": "Holson", "phone": "+420-310-583-5311"}0055{"command": "PUT", "name": "Tobit", "surname": "Arrigo", "phone": "+55-998-548-8754"}0056{"command": "PUT", "name": "Nick", "surname": "Buttrick", "phone": "+66-402-232-7380"}0057{"command": "PUT", "name": "Sheela", "surname": "Messier", "phone": "+93-208-735-9619"}0055{"command": "PUT", "name": "Catlee", "surname": "Cream", "phone": "+27-206-370-3889"}0055{"command": "PUT", "name": "Codi", "surname": "Portch", "phone": "+251-699-931-9665"}005a{"command": "PUT", "name": "Kamillah", "surname": "Enderson", "phone": "+63-521-684-4803"}'
-    array = re.findall(r"({[^}]+})", string)
-    print(array)
-    for item in array:
+    search_pattern = r"([a-f0-9]{4})({[^}]+})"
+    array1 = re.findall(search_pattern, string)
+    print(array1)
+    for item in array1:
         print(item)
 
     """
