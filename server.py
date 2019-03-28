@@ -40,7 +40,7 @@ class PozabljivImenik(Protocol):
             for command in array_of_commands:
                 command_id = uuid.uuid4().hex
                 self.action(command, request_id, command_id)
-
+            self.REQUESTS.pop(request_id, None)
         except Exception as e:
             print('Error: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
             self.response(False, 'JSONDecodeError: {}'.format(e), request_id)
