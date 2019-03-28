@@ -26,7 +26,6 @@ class Contacts:
             result = 'Prefix is missing!'
         end = time.clock()
         execution_time = str(timedelta(seconds=end-start)).split(":")[2]
-        print("It took {} to execute PUT action".format(execution_time))
         return success, result, execution_time
 
     def action_GET(self, data: dict):
@@ -42,7 +41,6 @@ class Contacts:
 
         end = time.clock()
         execution_time = str(timedelta(seconds=end-start)).split(":")[2]
-        print("It took {} to execute GET action".format(execution_time))
         return success, result, execution_time
 
     def action_DELETE(self, data: dict):
@@ -59,7 +57,6 @@ class Contacts:
 
         end = time.clock()
         execution_time = str(timedelta(seconds=end-start)).split(":")[2]
-        print("It took {} to execute DELETE action".format(execution_time))
         return success, result, execution_time
 
     def action_FIND(self, data: dict):
@@ -72,5 +69,4 @@ class Contacts:
             result = 'Prefix is missing!'
         end = time.clock()
         execution_time = str(timedelta(seconds=end-start)).split(":")[2]
-        print("It took {} seconds to execute FIND action".format(execution_time))
         return success, result, execution_time

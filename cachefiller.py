@@ -39,8 +39,8 @@ def main(address="127.0.0.1", port=4242):
         message = length + payload
         messages.append(message)
 
-    for random_command in COMMANDS:
-        payload = json.dumps(random_command).encode("utf-8")
+    for command in COMMANDS:
+        payload = json.dumps(command).encode("utf-8")
         length = b"%04x" % len(payload)
         message = length + payload
         messages.append(message)
@@ -50,7 +50,7 @@ def main(address="127.0.0.1", port=4242):
     sock.send(b"".join(messages))
 
     while 1:
-        d = sock.recvfrom(128)
+        d = sock.recvfrom(1024)
         reply = d[0]
         print("Server replied: {}".format(reply.decode('utf8')))
 
