@@ -45,7 +45,7 @@ class Contacts:
 
     def action_DELETE(self, data: dict):
         start = time.clock()
-        success, result = False, None
+        success, result = False, 'Contact was not found'
         if 'phone' in data:
             for contact in self.CONTACTS[:]:
                 if contact.phone == data['phone']:
