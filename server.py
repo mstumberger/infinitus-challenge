@@ -29,12 +29,6 @@ class PozabljivImenik(Protocol):
         request_id = uuid.uuid4().hex
         self.REQUESTS[request_id] = {"in": time.clock(), "out": None,  "commands": {}}
         data = data.decode('utf-8')
-        if data == '\x03':
-            self.transport.loseConnection()
-            return
-        if '\r\n\r\n' in data:
-            data = data.split('\r\n\r\n')[1]
-        print(data)
         try:
             array_of_commands = cP.decode(data)
             for command in array_of_commands:
