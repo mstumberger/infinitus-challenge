@@ -1,14 +1,17 @@
 from helpers.Contact import Contact
 from helpers.Filter import filter_by_prefix
+import time
+from datetime import timedelta
+
 
 class Contacts:
-    def __init__(self):
-        self.CONTACTS = [
-            Contact("klic", "v sili", "112"),
-            Contact("Klemen", "Klemen", "424242")
-        ]
+    CONTACTS = [
+        Contact("klic", "v sili", "112"),
+        Contact("Klemen", "Klemen", "424242")
+    ]
 
     def action_PUT(self, data: dict):
+        start = time.clock()
         result, success = None, False
         if 'name' in data.keys() and 'surname' in data.keys() and 'phone' in data.keys():
             for contact in self.CONTACTS:
@@ -21,9 +24,13 @@ class Contacts:
                 success = True
         else:
             result = 'Prefix is missing!'
-        return success, result
+        end = time.clock()
+        execution_time = str(timedelta(seconds=end-start)).split(":")[2]
+        print("It took {} to execute PUT action".format(execution_time))
+        return success, result, execution_time
 
     def action_GET(self, data: dict):
+        start = time.clock()
         success, result = False, []
         if 'phone' in data:
             for contact in self.CONTACTS:
@@ -32,9 +39,14 @@ class Contacts:
                     success = True
         else:
             result = 'Prefix is missing!'
-        return success, result
+
+        end = time.clock()
+        execution_time = str(timedelta(seconds=end-start)).split(":")[2]
+        print("It took {} to execute GET action".format(execution_time))
+        return success, result, execution_time
 
     def action_DELETE(self, data: dict):
+        start = time.clock()
         success, result = False, None
         if 'phone' in data:
             for contact in self.CONTACTS[:]:
@@ -44,13 +56,21 @@ class Contacts:
                     success = True
         else:
             result = 'Prefix is missing!'
-        return success, result
+
+        end = time.clock()
+        execution_time = str(timedelta(seconds=end-start)).split(":")[2]
+        print("It took {} to execute DELETE action".format(execution_time))
+        return success, result, execution_time
 
     def action_FIND(self, data: dict):
+        start = time.clock()
         success, result = False, None
         if 'prefix' in data:
             result = [contact.__dict__ for contact in filter_by_prefix(data['prefix'], self.CONTACTS)]
             success = True
         else:
             result = 'Prefix is missing!'
-        return success, result
+        end = time.clock()
+        execution_time = str(timedelta(seconds=end-start)).split(":")[2]
+        print("It took {} seconds to execute FIND action".format(execution_time))
+        return success, result, execution_time

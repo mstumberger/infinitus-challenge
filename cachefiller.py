@@ -15,6 +15,18 @@ CONTACTS = [
     {"name": "Codi", "surname": "Portch", "phone": "+251-699-931-9665"},
     {"name": "Kamillah", "surname": "Enderson", "phone": "+63-521-684-4803"},
 ]
+COMMANDS = [
+    {"command": "GET", "phone": "+7-812-344-9366"},
+    {"command": "FIND", "prefix": "Bat"},
+    {"command": "FIND", "prefix": "H"},
+    {"command": "FIND", "prefix": "Hu"},
+    {"command": "FIND", "prefix": "Ho"},
+    {"command": "DELETE", "phone": "+420-310-583-5311"},
+    {"command": "PUT", "name": "Kamillah", "surname": "Enderson", "phone": "112"},
+    {"command": "DELETE", "phone": "112"},
+    {"command": "DELETE", "phone": "112"},
+    {"command": "FIND", "prefix": "kl"}
+]
 
 
 def main(address="127.0.0.1", port=4242):
@@ -27,10 +39,20 @@ def main(address="127.0.0.1", port=4242):
         message = length + payload
         messages.append(message)
 
+    for random_command in COMMANDS:
+        payload = json.dumps(random_command).encode("utf-8")
+        length = b"%04x" % len(payload)
+        message = length + payload
+        messages.append(message)
+
     sock = socket.socket()
     sock.connect((address, port))
-    sock.sendall(b"".join(messages))
-    sock.close()
+    sock.send(b"".join(messages))
+
+    while 1:
+        d = sock.recvfrom(128)
+        reply = d[0]
+        print("Server replied: {}".format(reply.decode('utf8')))
 
 
 if __name__ == "__main__":
