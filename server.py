@@ -7,6 +7,7 @@ import helpers.CustomProtocol as cP
 import json
 import sys
 
+
 class PozabljivImenik(Protocol):
     CONTACTS = Contacts()
 
@@ -28,8 +29,9 @@ class PozabljivImenik(Protocol):
             data = data.split('\r\n\r\n')[1]
 
         try:
-            data = json.loads(data)
-            self.action(data)
+            array_of_commands = cP.decode(data)
+            for command in array_of_commands:
+                self.action(json.loads(command))
         except json.decoder.JSONDecodeError as e:
             print('JSONDecodeError: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
             self.response(False, 'JSONDecodeError: {}'.format(e))
