@@ -31,32 +31,44 @@ class PozabljivImenik(Protocol):
         try:
             array_of_commands = cP.decode(data)
             for command in array_of_commands:
-                self.action(json.loads(command[1]))
-        except json.decoder.JSONDecodeError as e:
-            print('JSONDecodeError: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
+                self.action(command)
+        except Exception as e:
+            print('Error: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
             self.response(False, 'JSONDecodeError: {}'.format(e))
 
-    def action(self, data):
+    def action(self, command):
         try:
-            if 'command' in data:
-                command = data['command'].upper()
-                if command == ACTION.PUT:
-                    success, result = self.CONTACTS.action_PUT(data)
+            length, data = command
+            try:
+                data = json.loads(data)
+            except json.decoder.JSONDecodeError as e:
+                print('JSONDecodeError: {}, line number: {}'.format(e, sys.exc_info()[2].tb_lineno))
+                self.response(False, 'JSONDecodeError: {}'.format(e))
 
-                elif command == ACTION.GET:
-                    success, result = self.CONTACTS.action_GET(data)
+            # if length validation is ok
+            if cP.encode(data) == "".join(command):
+                if 'command' in data:
+                    command = data['command'].upper()
+                    if command == ACTION.PUT:
+                        success, result = self.CONTACTS.action_PUT(data)
 
-                elif command == ACTION.DELETE:
-                    success, result = self.CONTACTS.action_DELETE(data)
+                    elif command == ACTION.GET:
+                        success, result = self.CONTACTS.action_GET(data)
 
-                elif command == ACTION.FIND:
-                    success, result = self.CONTACTS.action_FIND(data)
+                    elif command == ACTION.DELETE:
+                        success, result = self.CONTACTS.action_DELETE(data)
 
+                    elif command == ACTION.FIND:
+                        success, result = self.CONTACTS.action_FIND(data)
+
+                    else:
+                        result = 'Command not found or missing a value'
+                        success = False
                 else:
-                    result = 'Command not found or missing a value'
+                    result = 'Command is missing!'
                     success = False
             else:
-                result = 'Command is missing!'
+                result = 'Command length mismatch'
                 success = False
 
             self.response(success, result)
